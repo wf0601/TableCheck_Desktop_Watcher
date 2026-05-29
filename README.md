@@ -1,6 +1,12 @@
 # tablecheck desktop watcher
 
+[![License: PolyForm Personal Use 1.0.0](https://img.shields.io/badge/license-PolyForm%20Personal%20Use%201.0.0-blue)](LICENSE)
+[![Personal use only](https://img.shields.io/badge/use-personal%20only-orange)](LICENSE)
+![Platform: macOS](https://img.shields.io/badge/platform-macOS-lightgrey)
+
 A personal-use macOS menubar app (with optional CLI) that watches [TableCheck](https://www.tablecheck.com/) restaurants for openings, pings you when one matches your criteria, and launches a logged-in Chromium pre-filled and pre-navigated to the exact slot. You review and proceed to booking.
+
+> **Personal use only.** Licensed under [PolyForm Personal Use 1.0.0](LICENSE) — free for hobby, research, study, private entertainment, and noncommercial-organization use. Any commercial / for-profit business use is **not** permitted. See [LICENSE](LICENSE) for the full terms.
 
 ## What it does
 

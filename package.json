@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Watch TableCheck restaurants for openings and prefill the reservation form",
   "private": true,
+  "license": "SEE LICENSE IN LICENSE",
   "type": "module",
   "main": "src/menubar/main.cjs",
   "bin": {
