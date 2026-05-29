@@ -1,0 +1,22 @@
+# Copy to settings.yaml and edit if needed. All keys are optional — defaults shown.
+
+# How often the CLI poll loop checks each entry (seconds). Be polite — under 60s risks rate-limits.
+poll_interval_seconds: 180
+# Random jitter added to each poll so bursts don't align.
+poll_jitter_seconds: 30
+
+# Headless browser for monitoring. Set false to see it work (slower, useful for debugging).
+headless_check: true
+
+# What to do when an opening is found:
+#   notify       — desktop notification only
+#   open         — launch a visible browser, navigate to slot, prefill form
+#   notify+open  — both
+on_match: "notify+open"
+
+# Locale used to call the TableCheck API + open the reserve page.
+# (en | ja | ko | zh-CN | ...). Affects which form labels appear.
+locale: "en"
+
+# macOS notification sound. Set "" for silent. Examples: "Glass", "Ping", "Submarine"
+notify_sound: "Glass"

@@ -1,0 +1,15 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+
+# Local config holds personal data — never commit
+profile.yaml
+watchlist.yaml
+settings.yaml
+config.yaml
+config.yaml.bak
+state.json
+.browser-profile/
+.browser-profile-cookies.json
+debug/

@@ -1,0 +1,32 @@
+# Copy to profile.yaml and edit. profile.yaml is gitignored.
+# Used to autofill the reservation form when an opening is found.
+
+# Latin-script name (used on the EN form)
+first_name: Frankie
+last_name: Wu
+
+# Kanji name (used on the JP form). Leave blank if you only book in English.
+kanji_first_name: ""
+kanji_last_name: ""
+
+# Furigana (katakana/hiragana reading of your kanji name). Some JP forms ask for this.
+furigana_first_name: ""
+furigana_last_name: ""
+
+email: you@example.com
+# Phone in E.164 with country code, e.g. +819012345678
+phone: "+819000000000"
+
+# Optional dropdown values the form may show
+occasion: ""        # e.g. "birthday", "anniversary", "business", "other"
+visit_count: first  # first | 2nd | 3rd | 4th_plus
+notes: ""           # special requests / dietary notes
+
+# Optional: TableCheck login. If both fields are set, the app auto-signs-in (headless)
+# on launch and the session cookie is reused for all Autofill clicks.
+# WARNING: plaintext password on disk. The file is gitignored, but anyone with
+# local disk access can read it. Leave both empty and use the manual "Sign in"
+# button in the Profile tab if you'd rather.
+# Note: This won't work if your account uses Google/Apple SSO or 2FA.
+tablecheck_account: ""
+tablecheck_password: ""

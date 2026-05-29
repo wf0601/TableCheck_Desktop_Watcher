@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>TableCheck Watcher</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>TableCheck Watcher</h1>
+      <div class="header-actions">
+        <button id="reload-btn" title="Re-read all config files">↻</button>
+        <button id="save-exit-btn" class="quit-btn" title="Save loaded forms and quit the app">Save &amp; Quit</button>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="check">Check</button>
+      <button class="tab" data-tab="restaurants">Restaurants</button>
+      <button class="tab" data-tab="profile">Profile</button>
+    </nav>
+
+    <!-- ===== Check tab ===== -->
+    <section class="tab-panel active" id="tab-check">
+      <div class="card">
+        <div class="card-head">
+          <h2>Restaurants to check</h2>
+          <div class="select-actions">
+            <button class="link" id="select-all">All</button>
+            <button class="link" id="select-none">None</button>
+          </div>
+        </div>
+        <div id="restaurants" class="restaurant-list">Loading…</div>
+        <button id="check-btn" class="primary">Check Now</button>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Background polling</h2>
+          <span id="poll-status-pill" class="signin-status">…</span>
+        </div>
+        <p class="help-text">
+          When enabled, the app re-checks your watchlist on a timer and fires a desktop notification when a new slot opens. Notifications dedupe via <code>state.json</code> so you won't get pinged twice.
+        </p>
+        <div class="poll-row">
+          <label class="toggle-row">
+            <input type="checkbox" id="poll-enabled"> Enabled
+          </label>
+          <label class="inline-field">
+            Every
+            <input type="number" id="poll-minutes" min="1" max="60" value="5">
+            min
+          </label>
+          <label class="inline-field" title="0 = re-notify on every tick">
+            Re-notify after
+            <input type="number" id="poll-repeat" min="0" max="1440" value="30">
+            min
+          </label>
+          <label class="inline-field" title="Number of restaurants checked in parallel. Bump cautiously — TableCheck rate-limits per IP.">
+            Workers
+            <input type="number" id="poll-concurrency" min="1" max="4" value="2">
+          </label>
+          <button id="poll-apply" class="primary">Apply</button>
+          <button id="poll-stop" class="quit-btn" hidden>Stop Now</button>
+          <button id="poll-test-notify" class="link">Test notification</button>
+          <button id="poll-reset-history" class="link" title="Clear state.json so all currently-open slots will notify again on the next tick">Reset history</button>
+        </div>
+        <p class="help-text" id="poll-meta"></p>
+      </div>
+
+      <div class="card" id="results-card" hidden>
+        <div class="card-head">
+          <h2>Results</h2>
+          <span id="results-source" class="signin-status"></span>
+        </div>
+        <div id="results"></div>
+      </div>
+    </section>
+
+    <!-- ===== Restaurants tab ===== -->
+    <section class="tab-panel" id="tab-restaurants">
+      <div class="card">
+        <div class="card-head">
+          <h2>Watchlist</h2>
+          <button class="link" id="add-restaurant">+ Add</button>
+        </div>
+        <div id="watchlist-editor"></div>
+        <div class="save-bar">
+          <span id="watchlist-status" class="status"></span>
+          <button id="save-watchlist-btn" class="primary">Save Watchlist</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Profile tab ===== -->
+    <section class="tab-panel" id="tab-profile">
+      <div class="card">
+        <div class="card-head">
+          <h2>TableCheck account</h2>
+          <span id="signin-status" class="signin-status">checking…</span>
+        </div>
+        <p class="help-text">
+          Auto-sign-in runs at launch using credentials from <code>profile.yaml</code>. For Google/Apple SSO or 2FA, use the manual sign-in instead — the cookies will persist.
+        </p>
+        <div class="button-row">
+          <button id="signin-btn" class="primary">Sign in (manual)</button>
+          <button id="signin-now-btn" class="link">Re-check / sign in now</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Your booking details</h2>
+        <form id="profile-form" autocomplete="off">
+          <div class="field-grid">
+            <label>First name<input name="first_name" required></label>
+            <label>Last name<input name="last_name" required></label>
+            <label>Kanji 名 (first)<input name="kanji_first_name"></label>
+            <label>Kanji 姓 (last)<input name="kanji_last_name"></label>
+            <label>Furigana 名<input name="furigana_first_name"></label>
+            <label>Furigana 姓<input name="furigana_last_name"></label>
+            <label class="span2">Email<input name="email" type="email" required></label>
+            <label class="span2">Phone (E.164)<input name="phone" required placeholder="+81…"></label>
+            <label>Occasion<input name="occasion" placeholder="birthday / business / …"></label>
+            <label>Visit count
+              <select name="visit_count">
+                <option value="first">First</option>
+                <option value="2nd">2nd</option>
+                <option value="3rd">3rd</option>
+                <option value="4th_plus">4th+</option>
+              </select>
+            </label>
+            <label class="span2">Notes<textarea name="notes" rows="2" placeholder="dietary, special requests"></textarea></label>
+          </div>
+        </form>
+        <div class="save-bar">
+          <span id="profile-status" class="status"></span>
+          <button id="save-profile-btn" class="primary">Save Profile</button>
+        </div>
+      </div>
+    </section>
+
+    <script src="app.js"></script>
+  </body>
+</html>

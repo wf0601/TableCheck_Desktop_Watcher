@@ -1,0 +1,24 @@
+# Copy to watchlist.yaml and edit. watchlist.yaml is gitignored.
+#
+# Each entry watches one restaurant. Date selection — pick ONE or COMBINE:
+#   dates:         explicit YYYY-MM-DD list (any-of)
+#   window_weeks:  rolling window starting tomorrow, e.g. 10 = next 70 days
+#   window_days:   same idea, but in days
+# If both are set, the watched set is their union.
+#
+# `times`: list of HH:MM-HH:MM ranges (any-of). Omit/empty = any time.
+# `enabled: false` to pause an entry without deleting it.
+
+- name: Presente Sugi
+  url: https://www.tablecheck.com/shops/presente-sugi/reserve
+  party_size: 2
+  window_weeks: 10
+  times: []
+  enabled: true
+
+# - name: Another Spot
+#   url: https://www.tablecheck.com/shops/some-slug/reserve
+#   party_size: 4
+#   dates: ["2026-07-04"]
+#   times: ["19:00-20:30"]
+#   enabled: true
