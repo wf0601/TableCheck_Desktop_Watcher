@@ -1,6 +1,6 @@
-# tablecheck-crawler
+# tablecheck desktop watcher
 
-A personal-use macOS menubar app (with optional CLI) that watches [TableCheck](https://www.tablecheck.com/) restaurants for openings, pings you when one matches your criteria, and launches a logged-in Chromium pre-filled and pre-navigated to the exact slot. You review and click 予約する.
+A personal-use macOS menubar app (with optional CLI) that watches [TableCheck](https://www.tablecheck.com/) restaurants for openings, pings you when one matches your criteria, and launches a logged-in Chromium pre-filled and pre-navigated to the exact slot. You review and proceed to booking.
 
 ## What it does
 
