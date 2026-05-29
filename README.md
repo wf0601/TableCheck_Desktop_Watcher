@@ -31,6 +31,14 @@ npm run ui
 
 The TableCheck logo appears in your macOS menubar (top-right of your screen). Click it to open a popover with three tabs:
 
+| Check tab | Restaurants tab |
+|---|---|
+| ![Check tab with watchlist + Background polling card](screenshots/1.png) | ![Restaurants tab — inline editor for watchlist.yaml](screenshots/2.png) |
+
+| Profile tab | Results card (live) |
+|---|---|
+| ![Profile tab with TableCheck account + booking details](screenshots/3.png) | ![Results — grouped by restaurant, time as link, Autofill button](screenshots/4.png) |
+
 - **Check** — Tick which restaurants from your watchlist to scan, then **Check Now**. Results stream into the card below, grouped by restaurant + date (with weekday). Each available slot shows the time as a clickable link that opens the reservation page in your default browser; the **Autofill** button opens the slot inside our managed Chromium (logged in) so TableCheck auto-fills the form and you click Confirm.
 - **Restaurants** — Add / edit / delete watchlist entries inline. Each row has its own Save button (writes the whole `watchlist.yaml` atomically); changes are picked up by the next check.
 - **Profile** — Form for your booking details (name / email / phone / kanji / occasion / notes). The TableCheck account section shows a sign-in status pill, a manual sign-in button (for Google/Apple SSO or 2FA), and a "Re-check / sign in now" trigger. Credentials live in `profile.yaml`; the form deliberately doesn't expose the password field.
