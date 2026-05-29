@@ -2,8 +2,8 @@
 # Used to autofill the reservation form when an opening is found.
 
 # Latin-script name (used on the EN form)
-first_name: Frankie
-last_name: Wu
+first_name: Francis
+last_name: Fukuyama
 
 # Kanji name (used on the JP form). Leave blank if you only book in English.
 kanji_first_name: ""
@@ -15,7 +15,7 @@ furigana_last_name: ""
 
 email: you@example.com
 # Phone in E.164 with country code, e.g. +819012345678
-phone: "+819000000000"
+phone: "09000000000"
 
 # Optional dropdown values the form may show
 occasion: ""        # e.g. "birthday", "anniversary", "business", "other"
