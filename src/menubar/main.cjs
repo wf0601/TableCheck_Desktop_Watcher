@@ -105,7 +105,6 @@ mb.on("after-create-window", () => {
   if (!mb.window) return;
   const wc = mb.window.webContents;
   if (process.env.TC_DEVTOOLS) wc.openDevTools({ mode: "detach" });
-  // Echo renderer console + load errors into the terminal — useful for `npm run ui` debugging.
   wc.on("console-message", (_e, level, message, line, src) => {
     const tag = ["log", "warn", "error", "debug"][level] || level;
     console.log(`[renderer:${tag}] ${message} (${src}:${line})`);
@@ -113,6 +112,28 @@ mb.on("after-create-window", () => {
   wc.on("preload-error", (_e, p, err) => {
     console.error("[renderer] preload-error", p, err.message);
   });
+  wc.on("did-finish-load", async () => {
+    if (!process.env.TC_I18N_PROBE) return;
+    // Diagnostic: print what the renderer actually rendered for a known set
+    // of translated elements, so we can verify the i18n pass ran without
+    // needing to eyeball the popover.
+    try {
+      const sample = await wc.executeJavaScript(`({
+        lang: document.documentElement.lang,
+        title: document.querySelector('h1')?.textContent,
+        tabCheck: document.querySelector('[data-tab="check"]')?.textContent,
+        tabRestaurants: document.querySelector('[data-tab="restaurants"]')?.textContent,
+        tabProfile: document.querySelector('[data-tab="profile"]')?.textContent,
+        checkNow: document.getElementById('check-btn')?.textContent,
+        pollHeading: document.querySelector('#tab-check .card:nth-child(2) h2')?.textContent,
+      })`);
+      console.log("[i18n-probe]", JSON.stringify(sample));
+    } catch (e) {
+      console.error("[i18n-probe] failed:", e.message);
+    }
+  });
+  // First-load happens before listeners attach — reload only when probing.
+  if (process.env.TC_I18N_PROBE) wc.reload();
 });
 
 // --- IPC handlers ---

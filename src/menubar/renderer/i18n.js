@@ -5,9 +5,14 @@
 // - In HTML: <el data-i18n="key">English fallback text</el>
 //            <el data-i18n-attr-title="key" title="...">  (attribute translations)
 //            <el data-i18n-attr-placeholder="key" placeholder="...">
-// - In JS:   t("key") returns the translated string, falling back to en, then to the key.
-//            t("key", { foo: "bar" }) interpolates {foo}.
+// - In JS:   window.__i18n.t("key") returns the translated string, falling
+//            back to en, then to the key. Pass {vars} for {placeholder} interpolation.
+//
+// Wrapped in an IIFE so top-level names (DICT, t, locale) don't leak to the
+// global scope — non-module <script> tags share globals, which would collide
+// with app.js's `const { t, applyDomTranslations } = window.__i18n;`.
 "use strict";
+(function () {
 
 const DICT = {
   en: {
@@ -328,3 +333,5 @@ function applyDomTranslations(root = document) {
 }
 
 window.__i18n = { t, locale, applyDomTranslations };
+
+})();
