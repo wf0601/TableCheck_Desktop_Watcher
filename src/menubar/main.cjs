@@ -12,6 +12,18 @@ const { pathToFileURL } = require("node:url");
 // Use logo.jpeg from the repo root as the menubar icon, resized for the system menubar.
 const iconPath = resolve(__dirname, "..", "..", "logo.jpeg");
 
+// Locale selection: `--lang=ja` on the command line (preferred) or `TC_LANG=ja`
+// env var. Falls back to `en`. The renderer reads this from `?lang=...` in
+// its URL (see src/menubar/renderer/i18n.js).
+const SUPPORTED_LOCALES = ["en", "ja"];
+function detectLocale() {
+  const argv = process.argv.slice(1).find((a) => a.startsWith("--lang="));
+  const v = argv ? argv.slice(7) : process.env.TC_LANG;
+  return v && SUPPORTED_LOCALES.includes(v) ? v : "en";
+}
+const UI_LOCALE = detectLocale();
+console.log(`[main] UI locale: ${UI_LOCALE}`);
+
 // Resolve our compiled ESM modules by file:// URL so dynamic import works under CJS.
 const distUrl = (file) => pathToFileURL(join(__dirname, "..", "..", "dist", file)).href;
 
@@ -30,7 +42,7 @@ async function getLib() {
 
 const mb = menubar({
   dir: __dirname,
-  index: pathToFileURL(join(__dirname, "renderer", "index.html")).href,
+  index: pathToFileURL(join(__dirname, "renderer", "index.html")).href + `?lang=${UI_LOCALE}`,
   icon: iconPath,
   preloadWindow: true,
   showDockIcon: false,

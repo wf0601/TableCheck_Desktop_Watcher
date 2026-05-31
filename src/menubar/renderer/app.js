@@ -1,5 +1,9 @@
 "use strict";
 const api = window.tc;
+const { t, applyDomTranslations } = window.__i18n;
+
+// Apply translations to all static DOM elements marked with data-i18n attrs.
+applyDomTranslations();
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const $ = (id) => document.getElementById(id);
@@ -64,16 +68,16 @@ let watchlistLoaded = false;
 
 async function loadCheckList() {
   const container = $("restaurants");
-  container.textContent = "Loading…";
+  container.textContent = t("check.loading");
   try {
     checkList = await api.listWatchlist();
   } catch (e) {
-    container.textContent = "Failed to read watchlist.yaml: " + (e?.message ?? e);
+    container.textContent = t("check.failedWatchlist", { err: e?.message ?? e });
     return;
   }
   container.replaceChildren();
   if (checkList.length === 0) {
-    container.append(el("div", { class: "empty" }, "Watchlist is empty. Add a restaurant in the Restaurants tab."));
+    container.append(el("div", { class: "empty" }, t("check.empty")));
     return;
   }
   for (const w of checkList) {
@@ -83,7 +87,7 @@ async function loadCheckList() {
       "div",
       { class: "restaurant-row" + (w.enabled ? "" : " disabled") },
       el("label", { for: cb.id }, cb, el("strong", {}, w.name)),
-      el("div", { class: "meta" }, `party ${w.party_size} · ${w.targetDateCount}d`),
+      el("div", { class: "meta" }, t("check.meta", { party: w.party_size, days: w.targetDateCount })),
     );
     container.append(row);
   }
@@ -109,8 +113,8 @@ function renderResults(results, opts = {}) {
   for (const r of results) {
     const section = el("div", { class: "restaurant-result" });
     section.append(el("h3", {}, r.name));
-    if (r.error) { section.append(el("p", { class: "error" }, `Error: ${r.error}`)); container.append(section); continue; }
-    if (r.slots.length === 0) { section.append(el("p", { class: "empty" }, "No available slots in window.")); container.append(section); continue; }
+    if (r.error) { section.append(el("p", { class: "error" }, t("results.error", { err: r.error }))); container.append(section); continue; }
+    if (r.slots.length === 0) { section.append(el("p", { class: "empty" }, t("results.empty"))); container.append(section); continue; }
     const byDate = new Map();
     for (const s of r.slots) (byDate.get(s.date) || byDate.set(s.date, []).get(s.date)).push(s);
     const dates = [...byDate.keys()].sort();
@@ -131,40 +135,40 @@ function buildSlotPill(slot) {
   const timeLink = el("a", {
     class: "time-link",
     href: "#",
-    title: "Open reservation page in your default browser",
+    title: t("slot.openTitle"),
     onclick: (ev) => { ev.preventDefault(); api.openUrl(slot.deepLink); },
   }, slot.time);
   const autofillBtn = el("button", {
     class: "autofill",
-    title: "Open Chromium + prefill from your profile",
+    title: t("slot.autofillTitle"),
     onclick: async (ev) => {
       const b = ev.currentTarget;
-      b.disabled = true; const orig = b.textContent; b.textContent = "Launching…";
+      b.disabled = true; const orig = b.textContent; b.textContent = t("slot.autofillLaunching");
       try { await api.autofill(slot); } finally {
         setTimeout(() => { b.disabled = false; b.textContent = orig; }, 2000);
       }
     },
-  }, "Autofill");
+  }, t("slot.autofill"));
   return el("div", { class: "slot" }, timeLink, autofillBtn);
 }
 
 async function runCheck() {
   const checks = [...document.querySelectorAll("#restaurants input:checked")];
   const urls = checks.map((c) => c.dataset.url);
-  if (urls.length === 0) { alert("Pick at least one restaurant."); return; }
+  if (urls.length === 0) { alert(t("results.pickOne")); return; }
   const btn = $("check-btn");
   btn.disabled = true;
-  btn.textContent = `Checking ${urls.length}…`;
+  btn.textContent = t("results.checkingButton", { n: urls.length });
   $("results-card").hidden = false;
-  $("results").replaceChildren(el("div", { class: "loading" }, "Checking — 10-30s per restaurant…"));
+  $("results").replaceChildren(el("div", { class: "loading" }, t("results.checking")));
   try {
     const results = await api.check(urls);
-    renderResults(results, { sourceLabel: `Manual check · ${fmtRelTime(Date.now())}`, sourceKind: "" });
+    renderResults(results, { sourceLabel: t("results.sourceManual", { time: fmtRelTime(Date.now()) }), sourceKind: "" });
   } catch (e) {
-    $("results").replaceChildren(el("p", { class: "error" }, `Check failed: ${e?.message ?? e}`));
+    $("results").replaceChildren(el("p", { class: "error" }, t("results.checkFailed", { err: e?.message ?? e })));
   } finally {
     btn.disabled = false;
-    btn.textContent = "Check Now";
+    btn.textContent = t("check.checkNow");
   }
 }
 
@@ -187,7 +191,7 @@ async function loadProfileForm() {
     }
     profileLoaded = true;
   } catch (e) {
-    setStatus("profile-status", "Failed to load profile.yaml: " + (e?.message ?? e), "err");
+    setStatus("profile-status", t("profile.failedLoad", { err: e?.message ?? e }), "err");
   }
 }
 
@@ -197,11 +201,11 @@ $("save-profile-btn").addEventListener("click", async () => {
   const data = Object.fromEntries(new FormData(form));
   const btn = $("save-profile-btn");
   btn.disabled = true;
-  setStatus("profile-status", "Saving…");
+  setStatus("profile-status", t("profile.saving"));
   try {
     const res = await api.saveProfile(data);
-    if (res.ok) setStatus("profile-status", "Saved to profile.yaml ✓", "ok");
-    else setStatus("profile-status", "Save failed: " + res.error, "err");
+    if (res.ok) setStatus("profile-status", t("profile.savedFile"), "ok");
+    else setStatus("profile-status", t("profile.saveFailed", { err: res.error }), "err");
   } finally {
     btn.disabled = false;
   }
@@ -219,7 +223,7 @@ async function loadWatchlistEditor() {
     editorEntries = (await api.getWatchlistRaw()).map(normalizeEntry);
     watchlistLoaded = true;
   } catch (e) {
-    $("watchlist-editor").replaceChildren(el("p", { class: "error" }, "Failed to load watchlist.yaml: " + (e?.message ?? e)));
+    $("watchlist-editor").replaceChildren(el("p", { class: "error" }, t("watchlist.failedLoad", { err: e?.message ?? e })));
     return;
   }
   renderWatchlistEditor();
@@ -242,7 +246,7 @@ function renderWatchlistEditor() {
   const container = $("watchlist-editor");
   container.replaceChildren();
   if (editorEntries.length === 0) {
-    container.append(el("p", { class: "empty" }, "No entries. Click + Add."));
+    container.append(el("p", { class: "empty" }, t("watchlist.empty")));
     return;
   }
   editorEntries.forEach((entry, idx) => container.append(buildEntryCard(entry, idx)));
@@ -258,46 +262,44 @@ function buildEntryCard(entry, idx) {
           type: "checkbox", checked: entry.enabled,
           onchange: (ev) => update("enabled", ev.target.checked),
         }),
-        "Enabled",
+        t("watchlist.fields.enabled"),
       ),
       el("div", { class: "head-actions" },
         statusEl,
         el("button", {
           class: "save",
-          title: "Save this entry to watchlist.yaml",
+          title: t("watchlist.saveSingleTitle"),
           onclick: (ev) => saveSingleEntry(idx, ev.currentTarget, statusEl),
-        }, "Save"),
+        }, t("watchlist.save")),
         el("button", {
           class: "danger",
-          title: "Remove this entry",
+          title: t("watchlist.deleteTitle"),
           onclick: () => {
-            if (!confirm(`Remove "${entry.name || "this entry"}"?`)) return;
+            const name = entry.name || t("watchlist.deleteConfirmFallback");
+            if (!confirm(t("watchlist.deleteConfirm", { name }))) return;
             editorEntries.splice(idx, 1);
             renderWatchlistEditor();
           },
-        }, "Delete"),
+        }, t("watchlist.delete")),
       ),
     ),
     el("div", { class: "entry-grid" },
-      input("Name", entry.name, (v) => update("name", v), { span2: true, required: true }),
-      input("Reservation URL", entry.url, (v) => update("url", v), { span2: true, required: true, placeholder: "https://www.tablecheck.com/shops/<slug>/reserve" }),
-      input("Party size", entry.party_size, (v) => update("party_size", Number(v)), { type: "number", min: 1, max: 20, required: true }),
-      input("Window (weeks)", entry.window_weeks, (v) => update("window_weeks", v === "" ? "" : Number(v)), { type: "number", min: 1, max: 26 }),
-      input("Window (days)", entry.window_days, (v) => update("window_days", v === "" ? "" : Number(v)), { type: "number", min: 1, max: 180 }),
-      input("Explicit dates (YYYY-MM-DD, comma-sep)", entry.dates, (v) => update("dates", v), { placeholder: "2026-07-04, 2026-12-31" }),
-      input("Time ranges (HH:MM-HH:MM, comma-sep)", entry.times, (v) => update("times", v), { placeholder: "18:00-21:00 — leave blank for any time", span2: true }),
-      el("p", { class: "help" }, "Set at least one of: window (weeks), window (days), or explicit dates."),
+      input(t("watchlist.fields.name"), entry.name, (v) => update("name", v), { span2: true, required: true }),
+      input(t("watchlist.fields.url"), entry.url, (v) => update("url", v), { span2: true, required: true, placeholder: t("watchlist.fields.urlPlaceholder") }),
+      input(t("watchlist.fields.partySize"), entry.party_size, (v) => update("party_size", Number(v)), { type: "number", min: 1, max: 20, required: true }),
+      input(t("watchlist.fields.windowWeeks"), entry.window_weeks, (v) => update("window_weeks", v === "" ? "" : Number(v)), { type: "number", min: 1, max: 26 }),
+      input(t("watchlist.fields.windowDays"), entry.window_days, (v) => update("window_days", v === "" ? "" : Number(v)), { type: "number", min: 1, max: 180 }),
+      input(t("watchlist.fields.dates"), entry.dates, (v) => update("dates", v), { placeholder: t("watchlist.fields.datesPlaceholder") }),
+      input(t("watchlist.fields.times"), entry.times, (v) => update("times", v), { placeholder: t("watchlist.fields.timesPlaceholder"), span2: true }),
+      el("p", { class: "help" }, t("watchlist.fields.help")),
     ),
   );
   return card;
 }
 
 async function saveSingleEntry(idx, btn, statusEl) {
-  // Per-entry save still writes the whole watchlist.yaml — but feedback is inline
-  // so it's obvious which row's edit you're committing. If a SIBLING entry is
-  // invalid, the save will fail with a message identifying which one.
   const orig = btn.textContent;
-  btn.disabled = true; btn.textContent = "Saving…";
+  btn.disabled = true; btn.textContent = t("watchlist.saving");
   statusEl.className = "entry-status status";
   statusEl.textContent = "";
   try {
@@ -305,8 +307,7 @@ async function saveSingleEntry(idx, btn, statusEl) {
     const res = await api.saveWatchlist(list);
     if (res.ok) {
       statusEl.className = "entry-status status ok";
-      statusEl.textContent = "Saved ✓";
-      // Also refresh the Check tab's checkbox list so it shows the latest data.
+      statusEl.textContent = t("watchlist.saved");
       loadCheckList();
     } else {
       statusEl.className = "entry-status status err";
@@ -373,14 +374,14 @@ $("save-watchlist-btn").addEventListener("click", async () => {
   const btn = $("save-watchlist-btn");
   const list = editorEntries.map(denormalizeEntry);
   btn.disabled = true;
-  setStatus("watchlist-status", "Saving…");
+  setStatus("watchlist-status", t("watchlist.saving"));
   try {
     const res = await api.saveWatchlist(list);
     if (res.ok) {
-      setStatus("watchlist-status", "Saved to watchlist.yaml ✓", "ok");
-      await loadCheckList(); // refresh Check tab
+      setStatus("watchlist-status", t("watchlist.savedFile"), "ok");
+      await loadCheckList();
     } else {
-      setStatus("watchlist-status", "Save failed: " + res.error, "err");
+      setStatus("watchlist-status", t("watchlist.saveFailed", { err: res.error }), "err");
     }
   } finally {
     btn.disabled = false;
@@ -392,34 +393,32 @@ $("save-exit-btn").addEventListener("click", async (ev) => {
   const btn = ev.currentTarget;
   btn.disabled = true;
   const orig = btn.textContent;
-  btn.textContent = "Saving…";
+  btn.textContent = t("saveExit.saving");
   const errors = [];
 
-  // Save Profile if user loaded it.
   if (profileLoaded) {
     const form = $("profile-form");
     if (!form.reportValidity()) {
-      errors.push("Profile form has invalid fields");
+      errors.push(t("saveExit.profileInvalid"));
     } else {
       const data = Object.fromEntries(new FormData(form));
       const res = await api.saveProfile(data);
-      if (!res.ok) errors.push("Profile: " + res.error);
+      if (!res.ok) errors.push(t("saveExit.profilePrefix", { err: res.error }));
     }
   }
 
-  // Save Watchlist if user loaded it.
   if (watchlistLoaded) {
     try {
       const list = editorEntries.map(denormalizeEntry);
       const res = await api.saveWatchlist(list);
-      if (!res.ok) errors.push("Watchlist: " + res.error);
+      if (!res.ok) errors.push(t("saveExit.watchlistPrefix", { err: res.error }));
     } catch (e) {
-      errors.push("Watchlist: " + (e?.message ?? e));
+      errors.push(t("saveExit.watchlistPrefix", { err: e?.message ?? e }));
     }
   }
 
   if (errors.length > 0) {
-    const proceed = confirm("Save failed:\n\n" + errors.join("\n\n") + "\n\nQuit anyway?");
+    const proceed = confirm(t("saveExit.confirmQuitAnyway", { errors: errors.join("\n\n") }));
     if (!proceed) {
       btn.disabled = false;
       btn.textContent = orig;
@@ -427,7 +426,7 @@ $("save-exit-btn").addEventListener("click", async (ev) => {
     }
   }
 
-  btn.textContent = "Quitting…";
+  btn.textContent = t("saveExit.quitting");
   await api.quit();
 });
 
@@ -435,16 +434,17 @@ $("save-exit-btn").addEventListener("click", async (ev) => {
 function renderSignInStatus(s) {
   const el = $("signin-status");
   const map = {
-    "already":         { cls: "ok",   text: "✓ Signed in (cached session)" },
-    "signed-in":       { cls: "ok",   text: "✓ Signed in (just now)" },
-    "failed":          { cls: "err",  text: "✗ Sign-in failed — check credentials" },
-    "no-credentials":  { cls: "warn", text: "No auto-credentials — use manual" },
-    "skipped":         { cls: "warn", text: "Skipped" },
-    "unknown":         { cls: "",     text: "unknown" },
+    "already":         { cls: "ok",   key: "signin.status.already" },
+    "signed-in":       { cls: "ok",   key: "signin.status.signedIn" },
+    "failed":          { cls: "err",  key: "signin.status.failed" },
+    "no-credentials":  { cls: "warn", key: "signin.status.noCreds" },
+    "skipped":         { cls: "warn", key: "signin.status.skipped" },
+    "unknown":         { cls: "",     key: "signin.status.unknown" },
   };
-  const r = map[s?.result] ?? { cls: "", text: s?.result || "unknown" };
+  const r = map[s?.result] ?? { cls: "", key: null };
+  const text = r.key ? t(r.key) : (s?.result || t("signin.status.unknown"));
   el.className = "signin-status " + r.cls;
-  el.textContent = r.text + (s?.error ? ` (${s.error})` : "");
+  el.textContent = text + (s?.error ? ` (${s.error})` : "");
 }
 
 async function refreshSignInStatus() {
@@ -452,13 +452,13 @@ async function refreshSignInStatus() {
     const s = await api.getSignInStatus();
     renderSignInStatus(s);
   } catch (e) {
-    $("signin-status").textContent = "status unavailable";
+    $("signin-status").textContent = t("signin.status.unavailable");
   }
 }
 
 $("signin-btn").addEventListener("click", async (ev) => {
   const b = ev.currentTarget;
-  b.disabled = true; const orig = b.textContent; b.textContent = "Launching browser…";
+  b.disabled = true; const orig = b.textContent; b.textContent = t("profile.account.signinLaunching");
   try { await api.openSignIn(); } finally {
     setTimeout(() => { b.disabled = false; b.textContent = orig; }, 2000);
   }
@@ -466,8 +466,8 @@ $("signin-btn").addEventListener("click", async (ev) => {
 
 $("signin-now-btn").addEventListener("click", async (ev) => {
   const b = ev.currentTarget;
-  b.disabled = true; const orig = b.textContent; b.textContent = "Signing in…";
-  $("signin-status").textContent = "checking…";
+  b.disabled = true; const orig = b.textContent; b.textContent = t("profile.account.signingIn");
+  $("signin-status").textContent = t("poll.statusChecking");
   try {
     const s = await api.runSignInNow();
     renderSignInStatus(s);
@@ -489,18 +489,17 @@ function renderPollStatus(s) {
   const pill = $("poll-status-pill");
   if (s.running) {
     pill.className = "signin-status ok";
-    pill.textContent = s.tickInProgress ? "● Running (checking now…)" : "● Running";
+    pill.textContent = s.tickInProgress ? t("poll.statusRunningInProgress") : t("poll.statusRunning");
   } else {
     pill.className = "signin-status";
-    pill.textContent = "Stopped";
+    pill.textContent = t("poll.statusStopped");
   }
-  // Show Stop Now only when there's something running to stop.
   $("poll-stop").hidden = !s.running;
   const meta = $("poll-meta");
   const parts = [];
-  if (s.lastTickAt) parts.push(`last check: ${fmtRelTime(s.lastTickAt)}`);
-  if (s.nextTickAt) parts.push(`next: ${fmtRelTime(s.nextTickAt)}`);
-  if (s.lastError) parts.push(`error: ${s.lastError}`);
+  if (s.lastTickAt) parts.push(t("poll.metaLastCheck", { time: fmtRelTime(s.lastTickAt) }));
+  if (s.nextTickAt) parts.push(t("poll.metaNext", { time: fmtRelTime(s.nextTickAt) }));
+  if (s.lastError) parts.push(t("poll.metaError", { err: s.lastError }));
   meta.textContent = parts.join(" · ");
 }
 
@@ -525,7 +524,7 @@ $("poll-apply").addEventListener("click", async (ev) => {
   const btn = ev.currentTarget;
   btn.disabled = true;
   const orig = btn.textContent;
-  btn.textContent = "Applying…";
+  btn.textContent = t("poll.applying");
   try {
     const res = await api.setPollConfig({
       enabled: $("poll-enabled").checked,
@@ -533,7 +532,7 @@ $("poll-apply").addEventListener("click", async (ev) => {
       repeatMinutes: Number($("poll-repeat").value),
       concurrency: Number($("poll-concurrency").value),
     });
-    if (!res.ok) alert("Failed to save: " + res.error);
+    if (!res.ok) alert(t("watchlist.saveFailed", { err: res.error }));
     await syncPollFormFromSettings();
   } finally {
     btn.disabled = false;
@@ -549,15 +548,15 @@ $("poll-test-notify").addEventListener("click", async (ev) => {
 });
 
 $("poll-reset-history").addEventListener("click", async (ev) => {
-  if (!confirm("Clear notification history? All currently-open slots will notify again on the next tick.")) return;
+  if (!confirm(t("poll.resetConfirm"))) return;
   const btn = ev.currentTarget;
   btn.disabled = true;
   const orig = btn.textContent;
-  btn.textContent = "Clearing…";
+  btn.textContent = t("poll.resetClearing");
   try {
     const res = await api.resetNotificationHistory();
-    if (!res.ok) alert("Reset failed: " + res.error);
-    else btn.textContent = "Cleared ✓";
+    if (!res.ok) alert(t("watchlist.saveFailed", { err: res.error }));
+    else btn.textContent = t("poll.resetCleared");
   } finally {
     setTimeout(() => { btn.disabled = false; btn.textContent = orig; }, 1500);
   }
@@ -567,10 +566,10 @@ $("poll-stop").addEventListener("click", async (ev) => {
   const btn = ev.currentTarget;
   btn.disabled = true;
   const orig = btn.textContent;
-  btn.textContent = "Stopping…";
+  btn.textContent = t("poll.stopping");
   try {
     const res = await api.stopPollNow();
-    if (!res.ok) alert("Failed to stop: " + res.error);
+    if (!res.ok) alert(t("watchlist.saveFailed", { err: res.error }));
     await syncPollFormFromSettings();
   } finally {
     btn.disabled = false;
@@ -595,9 +594,10 @@ const pollResultsBuffer = [];
 let pollResultsStartedAt = null;
 
 function renderPollResultsBuffer(finished) {
+  const time = fmtRelTime(pollResultsStartedAt || Date.now());
   const label = pollResultsStartedAt
-    ? `Background poll · started ${fmtRelTime(pollResultsStartedAt)}${finished ? " (done)" : " (running…)"}`
-    : "Background poll";
+    ? t(finished ? "results.sourceBackgroundDone" : "results.sourceBackgroundRunning", { time })
+    : t("poll.heading");
   renderResults(pollResultsBuffer, {
     sourceLabel: label,
     sourceKind: finished ? "ok" : "",

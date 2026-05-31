@@ -2,76 +2,76 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>TableCheck Watcher</title>
+    <title data-i18n="header.title">TableCheck Watcher</title>
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <header>
-      <h1>TableCheck Watcher</h1>
+      <h1 data-i18n="header.title">TableCheck Watcher</h1>
       <div class="header-actions">
-        <button id="reload-btn" title="Re-read all config files">↻</button>
-        <button id="save-exit-btn" class="quit-btn" title="Save loaded forms and quit the app">Save &amp; Quit</button>
+        <button id="reload-btn" data-i18n-attr-title="header.reload" title="Re-read all config files">↻</button>
+        <button id="save-exit-btn" class="quit-btn" data-i18n="header.quit" data-i18n-attr-title="header.quit.title" title="Save loaded forms and quit the app">Save &amp; Quit</button>
       </div>
     </header>
 
     <nav class="tabs">
-      <button class="tab active" data-tab="check">Check</button>
-      <button class="tab" data-tab="restaurants">Restaurants</button>
-      <button class="tab" data-tab="profile">Profile</button>
+      <button class="tab active" data-tab="check" data-i18n="tab.check">Check</button>
+      <button class="tab" data-tab="restaurants" data-i18n="tab.restaurants">Restaurants</button>
+      <button class="tab" data-tab="profile" data-i18n="tab.profile">Profile</button>
     </nav>
 
     <!-- ===== Check tab ===== -->
     <section class="tab-panel active" id="tab-check">
       <div class="card">
         <div class="card-head">
-          <h2>Restaurants to check</h2>
+          <h2 data-i18n="check.heading">Restaurants to check</h2>
           <div class="select-actions">
-            <button class="link" id="select-all">All</button>
-            <button class="link" id="select-none">None</button>
+            <button class="link" id="select-all" data-i18n="check.selectAll">All</button>
+            <button class="link" id="select-none" data-i18n="check.selectNone">None</button>
           </div>
         </div>
-        <div id="restaurants" class="restaurant-list">Loading…</div>
-        <button id="check-btn" class="primary">Check Now</button>
+        <div id="restaurants" class="restaurant-list" data-i18n="check.loading">Loading…</div>
+        <button id="check-btn" class="primary" data-i18n="check.checkNow">Check Now</button>
       </div>
 
       <div class="card">
         <div class="card-head">
-          <h2>Background polling</h2>
-          <span id="poll-status-pill" class="signin-status">…</span>
+          <h2 data-i18n="poll.heading">Background polling</h2>
+          <span id="poll-status-pill" class="signin-status" data-i18n="poll.statusChecking">…</span>
         </div>
-        <p class="help-text">
+        <p class="help-text" data-i18n="poll.helpText">
           When enabled, the app re-checks your watchlist on a timer and fires a desktop notification when a new slot opens. Notifications dedupe via <code>state.json</code> so you won't get pinged twice.
         </p>
         <div class="poll-row">
           <label class="toggle-row">
-            <input type="checkbox" id="poll-enabled"> Enabled
+            <input type="checkbox" id="poll-enabled"> <span data-i18n="poll.enabled">Enabled</span>
           </label>
           <label class="inline-field">
-            Every
+            <span data-i18n="poll.every">Every</span>
             <input type="number" id="poll-minutes" min="1" max="60" value="5">
-            min
+            <span data-i18n="poll.min">min</span>
           </label>
-          <label class="inline-field" title="0 = re-notify on every tick">
-            Re-notify after
+          <label class="inline-field" data-i18n-attr-title="poll.repeatTitle" title="0 = re-notify on every tick">
+            <span data-i18n="poll.repeat">Re-notify after</span>
             <input type="number" id="poll-repeat" min="0" max="1440" value="30">
-            min
+            <span data-i18n="poll.min">min</span>
           </label>
-          <label class="inline-field" title="Number of restaurants checked in parallel. Bump cautiously — TableCheck rate-limits per IP.">
-            Workers
+          <label class="inline-field" data-i18n-attr-title="poll.workersTitle" title="Number of restaurants checked in parallel. Bump cautiously — TableCheck rate-limits per IP.">
+            <span data-i18n="poll.workers">Workers</span>
             <input type="number" id="poll-concurrency" min="1" max="4" value="2">
           </label>
-          <button id="poll-apply" class="primary">Apply</button>
-          <button id="poll-stop" class="quit-btn" hidden>Stop Now</button>
-          <button id="poll-test-notify" class="link">Test notification</button>
-          <button id="poll-reset-history" class="link" title="Clear state.json so all currently-open slots will notify again on the next tick">Reset history</button>
+          <button id="poll-apply" class="primary" data-i18n="poll.apply">Apply</button>
+          <button id="poll-stop" class="quit-btn" hidden data-i18n="poll.stopNow">Stop Now</button>
+          <button id="poll-test-notify" class="link" data-i18n="poll.testNotify">Test notification</button>
+          <button id="poll-reset-history" class="link" data-i18n="poll.resetHistory" data-i18n-attr-title="poll.resetHistoryTitle" title="Clear state.json so all currently-open slots will notify again on the next tick">Reset history</button>
         </div>
         <p class="help-text" id="poll-meta"></p>
       </div>
 
       <div class="card" id="results-card" hidden>
         <div class="card-head">
-          <h2>Results</h2>
+          <h2 data-i18n="results.heading">Results</h2>
           <span id="results-source" class="signin-status"></span>
         </div>
         <div id="results"></div>
@@ -82,13 +82,13 @@
     <section class="tab-panel" id="tab-restaurants">
       <div class="card">
         <div class="card-head">
-          <h2>Watchlist</h2>
-          <button class="link" id="add-restaurant">+ Add</button>
+          <h2 data-i18n="watchlist.heading">Watchlist</h2>
+          <button class="link" id="add-restaurant" data-i18n="watchlist.add">+ Add</button>
         </div>
         <div id="watchlist-editor"></div>
         <div class="save-bar">
           <span id="watchlist-status" class="status"></span>
-          <button id="save-watchlist-btn" class="primary">Save Watchlist</button>
+          <button id="save-watchlist-btn" class="primary" data-i18n="watchlist.saveAll">Save Watchlist</button>
         </div>
       </div>
     </section>
@@ -97,49 +97,50 @@
     <section class="tab-panel" id="tab-profile">
       <div class="card">
         <div class="card-head">
-          <h2>TableCheck account</h2>
-          <span id="signin-status" class="signin-status">checking…</span>
+          <h2 data-i18n="profile.account.heading">TableCheck account</h2>
+          <span id="signin-status" class="signin-status" data-i18n="poll.statusChecking">checking…</span>
         </div>
-        <p class="help-text">
+        <p class="help-text" data-i18n="profile.account.help">
           Auto-sign-in runs at launch using credentials from <code>profile.yaml</code>. For Google/Apple SSO or 2FA, use the manual sign-in instead — the cookies will persist.
         </p>
         <div class="button-row">
-          <button id="signin-btn" class="primary">Sign in (manual)</button>
-          <button id="signin-now-btn" class="link">Re-check / sign in now</button>
+          <button id="signin-btn" class="primary" data-i18n="profile.account.signin">Sign in (manual)</button>
+          <button id="signin-now-btn" class="link" data-i18n="profile.account.recheck">Re-check / sign in now</button>
         </div>
       </div>
 
       <div class="card">
-        <h2>Your booking details</h2>
+        <h2 data-i18n="profile.heading">Your booking details</h2>
         <form id="profile-form" autocomplete="off">
           <div class="field-grid">
-            <label>First name<input name="first_name" required></label>
-            <label>Last name<input name="last_name" required></label>
-            <label>Kanji 名 (first)<input name="kanji_first_name"></label>
-            <label>Kanji 姓 (last)<input name="kanji_last_name"></label>
-            <label>Furigana 名<input name="furigana_first_name"></label>
-            <label>Furigana 姓<input name="furigana_last_name"></label>
-            <label class="span2">Email<input name="email" type="email" required></label>
-            <label class="span2">Phone (E.164)<input name="phone" required placeholder="+81…"></label>
-            <label>Occasion<input name="occasion" placeholder="birthday / business / …"></label>
-            <label>Visit count
+            <label><span data-i18n="profile.firstName">First name</span><input name="first_name" required></label>
+            <label><span data-i18n="profile.lastName">Last name</span><input name="last_name" required></label>
+            <label><span data-i18n="profile.kanjiFirst">Kanji 名 (first)</span><input name="kanji_first_name"></label>
+            <label><span data-i18n="profile.kanjiLast">Kanji 姓 (last)</span><input name="kanji_last_name"></label>
+            <label><span data-i18n="profile.furiganaFirst">Furigana 名</span><input name="furigana_first_name"></label>
+            <label><span data-i18n="profile.furiganaLast">Furigana 姓</span><input name="furigana_last_name"></label>
+            <label class="span2"><span data-i18n="profile.email">Email</span><input name="email" type="email" required></label>
+            <label class="span2"><span data-i18n="profile.phone">Phone (E.164)</span><input name="phone" required data-i18n-attr-placeholder="profile.phonePlaceholder" placeholder="+81…"></label>
+            <label><span data-i18n="profile.occasion">Occasion</span><input name="occasion" data-i18n-attr-placeholder="profile.occasionPlaceholder" placeholder="birthday / business / …"></label>
+            <label><span data-i18n="profile.visitCount">Visit count</span>
               <select name="visit_count">
-                <option value="first">First</option>
-                <option value="2nd">2nd</option>
-                <option value="3rd">3rd</option>
-                <option value="4th_plus">4th+</option>
+                <option value="first" data-i18n="profile.visitFirst">First</option>
+                <option value="2nd" data-i18n="profile.visit2">2nd</option>
+                <option value="3rd" data-i18n="profile.visit3">3rd</option>
+                <option value="4th_plus" data-i18n="profile.visit4plus">4th+</option>
               </select>
             </label>
-            <label class="span2">Notes<textarea name="notes" rows="2" placeholder="dietary, special requests"></textarea></label>
+            <label class="span2"><span data-i18n="profile.notes">Notes</span><textarea name="notes" rows="2" data-i18n-attr-placeholder="profile.notesPlaceholder" placeholder="dietary, special requests"></textarea></label>
           </div>
         </form>
         <div class="save-bar">
           <span id="profile-status" class="status"></span>
-          <button id="save-profile-btn" class="primary">Save Profile</button>
+          <button id="save-profile-btn" class="primary" data-i18n="profile.save">Save Profile</button>
         </div>
       </div>
     </section>
 
+    <script src="i18n.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

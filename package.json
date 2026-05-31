@@ -16,7 +16,8 @@
     "watch": "tsx watch src/index.ts",
     "book": "tsx src/index.ts book",
     "check-once": "tsx src/index.ts check-once",
-    "ui": "npm run build && unset ELECTRON_RUN_AS_NODE && electron .",
+    "ui": "npm run build && unset ELECTRON_RUN_AS_NODE && electron . --lang=en",
+    "ui:ja": "npm run build && unset ELECTRON_RUN_AS_NODE && electron . --lang=ja",
     "ui:dev": "npm run build && unset ELECTRON_RUN_AS_NODE && electron . --enable-logging",
     "postinstall": "playwright install chromium"
   },
